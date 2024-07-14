@@ -1,12 +1,13 @@
 
 describe('Test with backend', () => {
+  const apiUrl = Cypress.env("apiUrl")
   beforeEach('login to application', ()=>{
     cy.intercept({method: 'Get', path: 'tags'}, {fixture: 'tags.json'})
     cy.loginToApplication()
   })
 
   it('verify correct request and response', () => {
-    cy.intercept('POST', 'https://conduit-api.bondaracademy.com/api/articles/').as('postCreateArticle')
+    cy.intercept('POST', apiUrl+'/api/articles/').as('postCreateArticle')
 
     cy.contains('New Article').click()
     cy.get('[formcontrolname="title"]').type('This is the article')
@@ -34,7 +35,7 @@ describe('Test with backend', () => {
     }).as('postCreateArticle')
 
     cy.contains('New Article').click()
-    cy.get('[formcontrolname="title"]').type('This is the article')
+    cy.get('[formcontrolname="title"]').type('This is the article 2')
     cy.get('[formcontrolname="description"]').type('This is a description')
     cy.get('[formcontrolname="body"]').type('this is a body of the article')
     cy.contains('Publish Article').click()
@@ -55,8 +56,8 @@ describe('Test with backend', () => {
   })
 
   it('verify global feed like count', ()=>{
-    cy.intercept('GET', 'https://conduit-api.bondaracademy.com/api/feed*', {"articles":[],"articlesCount":0})
-    cy.intercept('GET', 'https://conduit-api.bondaracademy.com/api/articles*', {fixture: 'articles.json'})
+    cy.intercept('GET', apiUrl+'/api/feed*', {"articles":[],"articlesCount":0})
+    cy.intercept('GET', apiUrl+'/api/articles*', {fixture: 'articles.json'})
     cy.contains('Global Feed').click()
     cy.get('app-article-list button').then(heartList => {
       expect(heartList[0]).to.contain('1')
@@ -64,7 +65,7 @@ describe('Test with backend', () => {
     })
   })
 
-  it.only('delete a new article', () => {
+  it('delete a new article', () => {
 
     const bodyRequest = {
       "article": {
@@ -77,7 +78,7 @@ describe('Test with backend', () => {
     cy.get('@token').then(token => {
       cy.request({
         method: 'POST',
-        url: 'https://conduit-api.bondaracademy.com/api/articles/',
+        url: apiUrl+'/api/articles/',
         headers: {'Authorization': 'Token ' + token},
         body: bodyRequest
       }).then(response => {
@@ -85,13 +86,13 @@ describe('Test with backend', () => {
       })
 
       cy.contains('Global Feed').click()
-      cy.intercept('https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0').as('getShortenedUrl');
+      cy.intercept(apiUrl+'/api/articles?limit=10&offset=0').as('getShortenedUrl');
       cy.wait('@getShortenedUrl');
       cy.get('.article-preview').first().click()
       cy.get('.article-actions').contains('Delete Article').click()
 
       cy.request({
-        url: 'https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0',
+        url: apiUrl+'/api/articles?limit=10&offset=0',
         headers: {'Authorization': 'Token ' + token},
         method: 'GET'
       }).its('body').then(body => {

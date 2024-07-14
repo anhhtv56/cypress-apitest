@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cypress:e2e": "start-test start http-get://localhost:4200 npx cypress run"
+    "cypress:e2e": "start-test start http-get://localhost:4200 npx cypress run",
+    "cy:open_dev": "npx cypress open --env username=cytest@test.com,password=123456",
+    "cy:open_qa": "npx cypress open --env username=cytest1@test.com,password=123456",
+    "cy:open_process": "npx cypress open --env username=$DB_USENAME,password=$PASSWORD"
   },
   "author": "",
   "license": "ISC",
