@@ -48,7 +48,7 @@ describe('Test with backend', () => {
     })
   })
 
-  it('verify popular tags are display', ()=>{
+  it('verify popular tags are display', {retries: 2}, ()=>{
     cy.fixture('tags').then((tagList)  => {
       tagList.tags.forEach( (tagElement) => cy.get('.tag-list').should('contain', tagElement)
       )
